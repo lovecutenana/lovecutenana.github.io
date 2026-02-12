@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="Keywords" content="爱心代码，程序员表白">
+    <meta name="Description" content="爱心代码，HTML文件，何书悦GitHub爱心代码项目">
+    <title>I love you - 娜娜</title>
+    <style type="text/css">
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            overflow: hidden;
+            background: linear-gradient(135deg, #1a0a14 0%, #2d1b2e 50%, #1a0a14 100%);
+            font-family: "微软雅黑", "幼圆", sans-serif;
+        }
+
+        canvas {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* 场景样式 */
+        .scene {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            transition: opacity 1.5s ease;
+        }
+
+        .scene1 {
+            opacity: 1;
+        }
+
+        .scene2 {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .scene2.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* 背景星星 */
+        .stars {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 2s infinite ease-in-out;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.2; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.5); }
+        }
+
+        /* 场景1 名字显示 */
+        #mainName {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 72px;
+            color: #ff6b9d;
+            text-shadow:
+                0 0 10px #ff6b9d,
+                0 0 20px #ff6b9d,
+                0 0 40px #ff6b9d,
+                0 0 80px #ff6b9d;
+            z-index: 100;
+            opacity: 0;
+            animation: fadeInName 2s ease forwards, pulseName 2s ease-in-out infinite 2s;
+            white-space: nowrap;
+        }
+
+        @keyframes fadeInName {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+            100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        }
+
+        @keyframes pulseName {
+            0%, 100% {
+                text-shadow:
+                    0 0 10px #ff6b9d,
+                    0 0 20px #ff6b9d,
+                    0 0 40px #ff6b9d,
+                    0 0 80px #ff6b9d;
+                transform: translate(-50%, -50%) scale(1);
+            }
+            50% {
+                text-shadow:
+                    0 0 20px #ff6b9d,
+                    0 0 40px #ff6b9d,
+                    0 0 60px #ff6b9d,
+                    0 0 100px #ff6b9d;
+                transform: translate(-50%, -50%) scale(1.05);
+            }
+        }
+
+        /* 场景2 标题 */
+        .title {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 48px;
+            color: #ffb6c1;
+            text-align: center;
+            z-index: 100;
+            opacity: 0;
+            animation: fadeInTitle 2s ease forwards 0.5s;
+            text-shadow: 0 0 20px #ff69b4, 0 0 40px #ff69b4;
+        }
+
+        @keyframes fadeInTitle {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); letter-spacing: 10px; }
+            100% { opacity: 1; transform: translate(-50%, -50%) scale(1); letter-spacing: 5px; }
+        }
+
+        .subtitle {
+            display: block;
+            font-size: 24px;
+            margin-top: 20px;
+            color: #ffc0cb;
+            animation: fadeInSubtitle 2s ease forwards 1.5s;
+            opacity: 0;
+        }
+
+        @keyframes fadeInSubtitle {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        /* 玫瑰花瓣 */
+        .petal {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background: linear-gradient(45deg, #ff1493, #ff69b4);
+            border-radius: 50% 0 50% 50%;
+            opacity: 0;
+            animation: fallPetal 8s linear infinite;
+        }
+
+        @keyframes fallPetal {
+            0% {
+                opacity: 0;
+                transform: translateY(-100px) rotate(0deg) scale(0.5);
+            }
+            10% { opacity: 0.8; }
+            90% { opacity: 0.8; }
+            100% {
+                opacity: 0;
+                transform: translateY(100vh) rotate(720deg) scale(1);
+            }
+        }
+
+        /* 爱心气泡 */
+        .heart-bubble {
+            position: absolute;
+            font-size: 24px;
+            animation: floatHeart 6s ease-in-out infinite;
+            opacity: 0;
+        }
+
+        @keyframes floatHeart {
+            0% {
+                opacity: 0;
+                transform: translateY(0) scale(0);
+            }
+            20% { opacity: 1; }
+            80% { opacity: 1; }
+            100% {
+                opacity: 0;
+                transform: translateY(-300px) scale(1.5);
+            }
+        }
+
+        /* 闪烁的心形 */
+        .heart-sparkle {
+            position: absolute;
+            font-size: 30px;
+            animation: sparkle 1.5s ease-in-out infinite;
+        }
+
+        @keyframes sparkle {
+            0%, 100% { opacity: 0.5; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+
+        /* 场景2背景 */
+        .bg-image {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -1;
+        }
+
+        .bg-overlay {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(180deg, rgba(26, 10, 20, 0.7) 0%, rgba(45, 27, 46, 0.8) 100%);
+            z-index: -1;
+        }
+
+        /* 相遇计时文字 */
+        .days-counter {
+            position: absolute;
+            bottom: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 36px;
+            color: #ffb6c1;
+            text-shadow: 0 0 10px #ff69b4;
+            opacity: 0;
+            animation: fadeInCounter 2s ease forwards 2s;
+        }
+
+        @keyframes fadeInCounter {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 背景星星 -->
+    <div class="stars" id="stars"></div>
+
+    <!-- 场景1: 名字展示 -->
+    <div class="scene scene1" id="scene1">
+        <canvas id="pinkboard" width="1920" height="947"></canvas>
+        <canvas id="canvas" width="1920" height="947"></canvas>
+        <div id="mainName">娜娜~ 我喜欢你</div>
+        <!-- 飘落的花瓣容器 -->
+        <div id="petals1"></div>
+    </div>
+
+    <!-- 场景2: 相识纪念日 -->
+    <div class="scene scene2" id="scene2">
+        <img src="../picture/VCG211283895629.jpg" class="bg-image">
+        <div class="bg-overlay"></div>
+        <canvas id="pinkboard2"></canvas>
+
+        <div class="title">
+            相识7月纪念日~
+            <span class="subtitle">每一个有你的日子，都是最美好的时光</span>
+        </div>
+
+        <div class="days-counter">愿与你携手走过更多岁月</div>
+
+        <!-- 飘落的花瓣容器 -->
+        <div id="petals2"></div>
+
+        <!-- 爱心气泡 -->
+        <div id="hearts"></div>
+    </div>
+
+    <script type="text/javascript">
+        // ===== 背景星星效果 =====
+        function createStars() {
+            const container = document.getElementById('stars');
+            const starCount = 150;
+
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.width = Math.random() * 3 + 1 + 'px';
+                star.style.height = star.style.width;
+                star.style.animationDelay = Math.random() * 2 + 's';
+                container.appendChild(star);
+            }
+        }
+        createStars();
+
+        // ===== 玫瑰花瓣效果 =====
+        function createPetals(containerId) {
+            const container = document.getElementById(containerId);
+            const petalCount = 20;
+
+            for (let i = 0; i < petalCount; i++) {
+                const petal = document.createElement('div');
+                petal.className = 'petal';
+                petal.style.left = Math.random() * 100 + '%';
+                petal.style.animationDelay = Math.random() * 8 + 's';
+                petal.style.animationDuration = (Math.random() * 4 + 6) + 's';
+                petal.style.transform = `rotate(${Math.random() * 360}deg)`;
+                container.appendChild(petal);
+            }
+        }
+        createPetals('petals1');
+
+        // ===== 爱心气泡效果（场景2）=====
+        function createHeartBubbles() {
+            const container = document.getElementById('hearts');
+            const hearts = ['❤', '💕', '💗', '💖', '💓', '💘'];
+
+            setInterval(() => {
+                const bubble = document.createElement('div');
+                bubble.className = 'heart-bubble';
+                bubble.textContent = hearts[Math.floor(Math.random() * hearts.length)];
+                bubble.style.left = Math.random() * 100 + '%';
+                bubble.style.bottom = '0px';
+                bubble.style.fontSize = (Math.random() * 20 + 20) + 'px';
+                container.appendChild(bubble);
+
+                setTimeout(() => bubble.remove(), 6000);
+            }, 800);
+        }
+        createHeartBubbles();
+
+        // ===== 场景1: 飘浮文字动画 =====
+        const colors = [
+            "#ffb6c1", "#ff69b4", "#ff1493", "#ffb7c5", "#ffc0cb",
+            "#ffa07a", "#ff7f50", "#ff6347", "#ff4500", "#ffd700",
+            "#ffe4b5", "#ffe4e1", "#f0f8ff", "#e6e6fa", "#dda0dd"
+        ];
+
+        var canvas = document.getElementById("canvas");
+        var ctx = canvas.getContext("2d");
+
+        var ww = window.innerWidth;
+        var wh = window.innerHeight;
+
+        var hearts = [];
+
+        function initScene1() {
+            requestAnimationFrame(renderScene1);
+            canvas.width = ww;
+            canvas.height = wh;
+            for (var i = 0; i < 80; i++) {
+                hearts.push(new Heart());
+            }
+        }
+
+        function Heart() {
+            this.x = Math.random() * ww;
+            this.y = Math.random() * wh;
+            this.opacity = Math.random() * 0.5 + 0.5;
+            this.vel = {
+                x: (Math.random() - 0.5) * 3,
+                y: (Math.random() - 0.5) * 3,
+            };
+            this.targetScale = Math.random() * 0.12 + 0.02;
+            this.scale = this.targetScale * Math.random();
+            this.rotation = Math.random() * Math.PI * 2;
+            this.rotSpeed = (Math.random() - 0.5) * 0.02;
+        }
+
+        Heart.prototype.update = function (i) {
+            this.x += this.vel.x;
+            this.y += this.vel.y;
+            this.rotation += this.rotSpeed;
+            this.scale += (this.targetScale - this.scale) * 0.01;
+
+            if (this.x - this.width > ww || this.x + this.width < 0) {
+                this.scale = 0;
+                this.x = Math.random() * ww;
+            }
+            if (this.y - this.height > wh || this.y + this.height < 0) {
+                this.scale = 0;
+                this.y = Math.random() * wh;
+            }
+            this.width = 400;
+            this.height = 350;
+        };
+
+        Heart.prototype.draw = function (i) {
+            ctx.save();
+            ctx.globalAlpha = this.opacity;
+            ctx.font = `${160 * this.scale}px "微软雅黑"`;
+            ctx.fillStyle = colors[i % colors.length];
+            ctx.textAlign = "center";
+            ctx.translate(this.x, this.y);
+            ctx.rotate(this.rotation);
+            ctx.fillText("娜娜~ 我喜欢你", 0, 0);
+            ctx.restore();
+        };
+
+        function renderScene1() {
+            ctx.clearRect(0, 0, ww, wh);
+            for (var i = 0; i < hearts.length; i++) {
+                hearts[i].update(i);
+                hearts[i].draw(i);
+            }
+            requestAnimationFrame(renderScene1);
+        }
+
+        // ===== 爱心粒子系统 =====
+        var settings = {
+            particles: {
+                length: 600,
+                duration: 2.5,
+                velocity: 120,
+                effect: -0.75,
+                size: 35,
+            },
+        };
+
+        var Point = (function () {
+            function Point(x, y) {
+                this.x = typeof x !== "undefined" ? x : 0;
+                this.y = typeof y !== "undefined" ? y : 0;
+            }
+            Point.prototype.clone = function () { return new Point(this.x, this.y); };
+            Point.prototype.length = function (length) {
+                if (typeof length == "undefined") return Math.sqrt(this.x * this.x + this.y * this.y);
+                this.normalize();
+                this.x *= length;
+                this.y *= length;
+                return this;
+            };
+            Point.prototype.normalize = function () {
+                var length = this.length();
+                this.x /= length;
+                this.y /= length;
+                return this;
+            };
+            return Point;
+        })();
+
+        var Particle = (function () {
+            function Particle() {
+                this.position = new Point();
+                this.velocity = new Point();
+                this.acceleration = new Point();
+                this.age = 0;
+            }
+            Particle.prototype.initialize = function (x, y, dx, dy) {
+                this.position.x = x;
+                this.position.y = y;
+                this.velocity.x = dx;
+                this.velocity.y = dy;
+                this.acceleration.x = dx * settings.particles.effect;
+                this.acceleration.y = dy * settings.particles.effect;
+                this.age = 0;
+            };
+            Particle.prototype.update = function (deltaTime) {
+                this.position.x += this.velocity.x * deltaTime;
+                this.position.y += this.velocity.y * deltaTime;
+                this.velocity.x += this.acceleration.x * deltaTime;
+                this.velocity.y += this.acceleration.y * deltaTime;
+                this.age += deltaTime;
+            };
+            Particle.prototype.draw = function (context, image) {
+                function ease(t) { return --t * t * t + 1; }
+                var size = image.width * ease(this.age / settings.particles.duration);
+                context.globalAlpha = Math.max(0, 1 - this.age / settings.particles.duration);
+                context.drawImage(image, this.position.x - size / 2, this.position.y - size / 2, size, size);
+            };
+            return Particle;
+        })();
+
+        var ParticlePool = (function () {
+            var particles, firstActive = 0, firstFree = 0, duration = settings.particles.duration;
+            function ParticlePool(length) {
+                particles = new Array(length);
+                for (var i = 0; i < particles.length; i++) particles[i] = new Particle();
+            }
+            ParticlePool.prototype.add = function (x, y, dx, dy) {
+                particles[firstFree].initialize(x, y, dx, dy);
+                firstFree++;
+                if (firstFree == particles.length) firstFree = 0;
+                if (firstActive == firstFree) firstActive++;
+                if (firstActive == particles.length) firstActive = 0;
+            };
+            ParticlePool.prototype.update = function (deltaTime) {
+                var i;
+                if (firstActive < firstFree) {
+                    for (i = firstActive; i < firstFree; i++) particles[i].update(deltaTime);
+                }
+                if (firstFree < firstActive) {
+                    for (i = firstActive; i < particles.length; i++) particles[i].update(deltaTime);
+                    for (i = 0; i < firstFree; i++) particles[i].update(deltaTime);
+                }
+                while (particles[firstActive].age >= duration && firstActive != firstFree) {
+                    firstActive++;
+                    if (firstActive == particles.length) firstActive = 0;
+                }
+            };
+            ParticlePool.prototype.draw = function (context, image) {
+                if (firstActive < firstFree) {
+                    for (i = firstActive; i < firstFree; i++) particles[i].draw(context, image);
+                }
+                if (firstFree < firstActive) {
+                    for (i = firstActive; i < particles.length; i++) particles[i].draw(context, image);
+                    for (i = 0; i < firstFree; i++) particles[i].draw(context, image);
+                }
+            };
+            return ParticlePool;
+        })();
+
+        function createParticleSystem(canvasId) {
+            var context = document.getElementById(canvasId).getContext("2d"),
+                particles = new ParticlePool(settings.particles.length),
+                particleRate = settings.particles.length / settings.particles.duration,
+                time;
+
+            function pointOnHeart(t) {
+                return new Point(
+                    160 * Math.pow(Math.sin(t), 3),
+                    130 * Math.cos(t) - 50 * Math.cos(2 * t) - 20 * Math.cos(3 * t) - 10 * Math.cos(4 * t) + 25
+                );
+            }
+
+            var image = (function () {
+                var c = document.createElement("canvas"), cx = c.getContext("2d");
+                c.width = settings.particles.size;
+                c.height = settings.particles.size;
+                function to(t) {
+                    var point = pointOnHeart(t);
+                    point.x = settings.particles.size / 2 + point.x * settings.particles.size / 350;
+                    point.y = settings.particles.size / 2 - point.y * settings.particles.size / 350;
+                    return point;
+                }
+                cx.beginPath();
+                var t = -Math.PI, point = to(t);
+                cx.moveTo(point.x, point.y);
+                while (t < Math.PI) {
+                    t += 0.01;
+                    point = to(t);
+                    cx.lineTo(point.x, point.y);
+                }
+                cx.closePath();
+                cx.fillStyle = "#ff69b4";
+                cx.fill();
+                var img = new Image();
+                img.src = c.toDataURL();
+                return img;
+            })();
+
+            function render() {
+                requestAnimationFrame(render);
+                var newTime = new Date().getTime() / 1000,
+                    deltaTime = newTime - (time || newTime);
+                time = newTime;
+                context.clearRect(0, 0, context.canvas.width, context.canvas.height);
+                var amount = particleRate * deltaTime;
+                for (var i = 0; i < amount; i++) {
+                    var pos = pointOnHeart(Math.PI - 2 * Math.PI * Math.random());
+                    var dir = pos.clone().length(settings.particles.velocity);
+                    particles.add(context.canvas.width / 2 + pos.x, context.canvas.height / 2 - pos.y, dir.x, -dir.y);
+                }
+                particles.update(deltaTime);
+                particles.draw(context, image);
+            }
+
+            function onResize() {
+                context.canvas.width = context.canvas.clientWidth;
+                context.canvas.height = context.canvas.clientHeight;
+            }
+            window.onresize = onResize;
+            setTimeout(function () { onResize(); render(); }, 10);
+        }
+
+        // 启动两个场景的粒子系统
+        createParticleSystem("pinkboard");
+        createParticleSystem("pinkboard2");
+
+        // ===== 场景切换逻辑 =====
+        var SWITCH_TIME = 8000; // 8秒后自动切换
+        var currentScene = 1;
+
+        function switchToScene1() {
+            currentScene = 1;
+            document.getElementById("scene1").style.opacity = "1";
+            document.getElementById("scene1").style.pointerEvents = "auto";
+            document.getElementById("scene2").classList.remove("active");
+        }
+
+        function switchToScene2() {
+            currentScene = 2;
+            document.getElementById("scene1").style.opacity = "0";
+            document.getElementById("scene1").style.pointerEvents = "none";
+            document.getElementById("scene2").classList.add("active");
+            // 为场景2创建花瓣
+            createPetals('petals2');
+        }
+
+        function toggleScene() {
+            if (currentScene === 1) {
+                switchToScene2();
+            } else {
+                switchToScene1();
+            }
+        }
+
+        // 点击页面切换场景
+        document.addEventListener('click', toggleScene);
+
+        // 启动场景1
+        initScene1();
+
+        // 定时切换到场景2
+        setTimeout(switchToScene2, SWITCH_TIME);
+
+        // 窗口大小改变处理
+        window.addEventListener("resize", function () {
+            ww = window.innerWidth;
+            wh = window.innerHeight;
+        });
+    </script>
+</body>
+
+</html>
